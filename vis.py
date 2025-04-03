@@ -1,4 +1,5 @@
 import pygame
+import time
 
 SHOW_BORDER = False
 MANUAL_CONTROL = False
@@ -216,6 +217,17 @@ def draw_goal(grid_x, grid_y):
     # Draw the goal marker as a blue circle
     pygame.draw.circle(screen, (0, 0, 255), (center_x, center_y), cell_size // 4)
 
+last_key_pressed = None
+key_pressed_time = None
+
+def draw_key_pressed():
+    if last_key_pressed and time.time() - key_pressed_time < 0.1:
+        font = pygame.font.Font(None, 36)  # Font for the key display
+        text = font.render(last_key_pressed, True, WHITE)
+        text_rect = text.get_rect()
+        text_rect.bottomright = (1280 - 10, 720 - 10)  # Bottom-right corner with padding
+        screen.blit(text, text_rect)
+
 start = (0, 13)
 goal = (10, 1)
 car = Car(start[0], start[1], "R")  # Initialize the car at grid position (0, 7) facing right
@@ -226,6 +238,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYUP:
+            last_key_pressed = pygame.key.name(event.key).upper()
+            key_pressed_time = time.time()
+
             if MANUAL_CONTROL:
                 if event.key == pygame.K_RIGHT:
                     car.turn("R")
@@ -246,6 +261,7 @@ while running:
     draw_start(start[0], start[1])
     draw_goal(goal[0], goal[1])
     draw_car(car.grid_x, car.grid_y, car.dir_to_str())  # Draw the car
+    draw_key_pressed()
     pygame.display.flip()
     clock.tick(60)
 
