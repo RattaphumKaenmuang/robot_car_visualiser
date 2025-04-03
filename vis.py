@@ -123,6 +123,10 @@ def draw_car(grid_x, grid_y, direction):
         point1 = (center_x, center_y - cell_size // 3)  # Top point
         point2 = (center_x - cell_size // 3, center_y + cell_size // 3)  # Bottom-left point
         point3 = (center_x + cell_size // 3, center_y + cell_size // 3)  # Bottom-right point
+    elif direction == "R":
+        point1 = (center_x + cell_size // 3, center_y)  # Right point
+        point2 = (center_x - cell_size // 3, center_y - cell_size // 3)  # Top-left point
+        point3 = (center_x - cell_size // 3, center_y + cell_size // 3)  # Bottom-left point
     elif direction == "D":
         point1 = (center_x, center_y + cell_size // 3)  # Bottom point
         point2 = (center_x - cell_size // 3, center_y - cell_size // 3)  # Top-left point
@@ -131,10 +135,6 @@ def draw_car(grid_x, grid_y, direction):
         point1 = (center_x - cell_size // 3, center_y)  # Left point
         point2 = (center_x + cell_size // 3, center_y - cell_size // 3)  # Top-right point
         point3 = (center_x + cell_size // 3, center_y + cell_size // 3)  # Bottom-right point
-    elif direction == "R":
-        point1 = (center_x + cell_size // 3, center_y)  # Right point
-        point2 = (center_x - cell_size // 3, center_y - cell_size // 3)  # Top-left point
-        point3 = (center_x - cell_size // 3, center_y + cell_size // 3)  # Bottom-left point
 
     # Draw the triangle
     pygame.draw.polygon(screen, RED, [point1, point2, point3])
@@ -145,20 +145,24 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN and MANUAL_CONTROL:
-            if event.key == pygame.K_UP:  # Turn up
-                car.turn("U")
-            elif event.key == pygame.K_DOWN:  # Turn down
-                car.turn("D")
-            elif event.key == pygame.K_LEFT:  # Turn left
-                car.turn("L")
-            elif event.key == pygame.K_RIGHT:  # Turn right
-                car.turn("R")
-            elif event.key == pygame.K_SPACE:  # Move forward
-                try:
-                    car.go()
-                except ValueError as e:
-                    print(e)  # Handle invalid moves (e.g., moving out of bounds)
+        elif event.type == pygame.KEYDOWN:
+            if MANUAL_CONTROL:
+                if event.key == pygame.K_UP:
+                    car.turn("U")
+                elif event.key == pygame.K_RIGHT:
+                    car.turn("R")
+                elif event.key == pygame.K_DOWN:
+                    car.turn("D")
+                elif event.key == pygame.K_LEFT:
+                    car.turn("L")
+                elif event.key == pygame.K_SPACE:
+                    try:
+                        car.go()
+                    except ValueError as e:
+                        print(e)
+
+            elif event.key == pygame.K_SPACE:
+                pass
 
     screen.fill("black")
     draw_track()
