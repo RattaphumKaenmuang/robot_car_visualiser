@@ -22,7 +22,50 @@ grid = [
         " │   │   │ ",
         "─┼─ ─┼───┼─",
         " │   │   │"
-    ]       
+    ]
+grid_size_x = len(grid[0])
+grid_size_y = len(grid)
+
+class Car:
+    def __init__(self, grid_x, grid_y, dir_str):
+        self.grid_x = grid_x
+        self.grid_y = grid_y
+        self.dir = Car.str_to_vec(dir_str)   
+        
+    def str_to_vec(dir_str):
+        if dir_str == "U":
+            return (0, -1)
+        elif dir_str == "R":
+            return (1, 0)
+        elif dir_str == "D":
+            return (0, 1)
+        elif dir_str == "L":
+            return (-1, 0)
+        else:
+            raise ValueError("What the fuck is that direction?")
+    
+    def dir_to_str(self):
+        if self.dir == (0, -1):
+            return "U"
+        elif self.dir == (1, 0):
+            return "R"
+        elif self.dir == (0, 1):
+            return "D"
+        elif self.dir == (-1, 0):
+            return "L"
+    
+    def turn(self, dir_str):
+        self.dir = Car.str_to_vec(dir_str)
+    
+    def go(self):
+        new_grid_x = self.grid_x + self.dir[0]
+        new_grid_y = self.grid_y + self.dir[1]
+
+        if not(0 <= new_grid_x < grid_size_x and 0 <= new_grid_y < grid_size_y) or grid[new_grid_y][new_grid_x] == " ":
+            raise ValueError("Car tried to move into empty space.")
+        else:
+            self.grid_x = new_grid_x
+            self.grid_y = new_grid_y
 
 def draw_numbers():
     font = pygame.font.Font(None, 24)  # Use default font with size 24
@@ -90,15 +133,31 @@ def draw_car(grid_x, grid_y, direction):
     # Draw the triangle
     pygame.draw.polygon(screen, RED, [point1, point2, point3])
 
+car = Car(0, 7, "R")  # Initialize the car at grid position (7, 0) facing right
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:  # Turn up
+                car.turn("U")
+            elif event.key == pygame.K_DOWN:  # Turn down
+                car.turn("D")
+            elif event.key == pygame.K_LEFT:  # Turn left
+                car.turn("L")
+            elif event.key == pygame.K_RIGHT:  # Turn right
+                car.turn("R")
+            elif event.key == pygame.K_SPACE:  # Move forward
+                try:
+                    car.go()
+                except ValueError as e:
+                    print(e)  # Handle invalid moves (e.g., moving out of bounds)
+
     screen.fill("black")
     draw_track()
     draw_numbers()
-    draw_car(0,7,"R")
+    draw_car(car.grid_x, car.grid_y, car.dir_to_str())  # Draw the car
     pygame.display.flip()
     clock.tick(60)
 
