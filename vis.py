@@ -192,6 +192,20 @@ def draw_car(grid_x, grid_y, direction):
     # Draw the triangle
     pygame.draw.polygon(screen, RED, [point1, point2, point3])
 
+def draw_start(grid_x, grid_y):
+    # Calculate the center of the cell based on grid coordinates
+    center_x = start_x + grid_x * cell_size + cell_size // 2
+    center_y = start_y + grid_y * cell_size + cell_size // 2
+    # Draw the start marker as a green circle
+    pygame.draw.circle(screen, (0, 255, 0), (center_x, center_y), cell_size // 4)
+
+def draw_goal(grid_x, grid_y):
+    # Calculate the center of the cell based on grid coordinates
+    center_x = start_x + grid_x * cell_size + cell_size // 2
+    center_y = start_y + grid_y * cell_size + cell_size // 2
+    # Draw the goal marker as a blue circle
+    pygame.draw.circle(screen, (0, 0, 255), (center_x, center_y), cell_size // 4)
+
 start = (0, 7)
 goal = (10, 1)
 car = Car(start[0], start[1], "R")  # Initialize the car at grid position (0, 7) facing right
@@ -219,6 +233,8 @@ while running:
     screen.fill("black")
     draw_track()
     draw_numbers()
+    draw_start(start[0], start[1])
+    draw_goal(goal[0], goal[1])
     draw_car(car.grid_x, car.grid_y, car.dir_to_str())  # Draw the car
     pygame.display.flip()
     clock.tick(60)
