@@ -1,10 +1,12 @@
 import pygame
 
+SHOW_BORDER = False
+MANUAL_CONTROL = False
+
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-show_border = False
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -56,6 +58,10 @@ class Car:
     
     def turn(self, dir_str):
         self.dir = Car.str_to_vec(dir_str)
+
+    def u_turn(self):
+        self.dir[0] *= -1
+        self.dir[1] *= -1
     
     def go(self):
         new_grid_x = self.grid_x + self.dir[0]
@@ -94,7 +100,7 @@ def draw_track():
             y = start_y + row_index * cell_size
 
             # Draw the cell border
-            if show_border:
+            if SHOW_BORDER:
                 pygame.draw.rect(screen, RED, (x, y, cell_size, cell_size), 1)
 
             # Draw the track elements
@@ -139,7 +145,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and MANUAL_CONTROL:
             if event.key == pygame.K_UP:  # Turn up
                 car.turn("U")
             elif event.key == pygame.K_DOWN:  # Turn down
