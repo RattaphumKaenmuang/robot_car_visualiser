@@ -10,17 +10,25 @@ running = True
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-cell_size = 50
+cell_size = 30
 start_x, start_y = 200, 100
 grid = [
         " │   │   │ ",
         "─┼───┼───┼─",
+        " │   │   │ ",
         " │       │ ",
+        " │   │   │ ",
         "─┼───┼─ ─┼─",
+        " │   │   │ ",
         "     │   │ ",
+        " │   │   │ ",
         "─┼─ ─┼───┼─",
+        " │   │   │ ",
         " │   │     ",
+        " │   │   │ ",
         "─┼───┼─ ─┼─",
+        " │   │   │ ",
+        " │   │   │ ",
         " │   │   │ ",
         "─┼─ ─┼───┼─",
         " │   │   │"
@@ -105,18 +113,20 @@ class Simulation:
         if not self.goal_reached:
             if (self.car.grid_x, self.car.grid_y) == self.goal_grid:
                 self.goal_reached = True
-                return
-            
-            if out_of_bound(new_grid_x, new_grid_y) or whitespace_hit(new_grid_x, new_grid_y) and self.turns:
-                self.car.u_turn()
-                self.turns.pop()
+
             elif cur_tile == "┼" and not self.turned_at_intersection:
                 self.car.turn("R")
                 self.turned_at_intersection = True
                 self.turns.append("R")
+
             elif cur_tile == "┼":
                 self.car.go()
                 self.turned_at_intersection = False
+
+            elif out_of_bound(new_grid_x, new_grid_y) or whitespace_hit(new_grid_x, new_grid_y) and self.turns:
+                self.car.u_turn()
+                self.turns.pop()
+                
             else:
                 self.car.go()
             
@@ -206,7 +216,7 @@ def draw_goal(grid_x, grid_y):
     # Draw the goal marker as a blue circle
     pygame.draw.circle(screen, (0, 0, 255), (center_x, center_y), cell_size // 4)
 
-start = (0, 7)
+start = (0, 13)
 goal = (10, 1)
 car = Car(start[0], start[1], "R")  # Initialize the car at grid position (0, 7) facing right
 sim = Simulation(car, start, goal)
