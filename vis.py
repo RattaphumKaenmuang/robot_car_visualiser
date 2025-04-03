@@ -28,50 +28,103 @@ grid = [
 grid_size_x = len(grid[0])
 grid_size_y = len(grid)
 
+def out_of_bound(grid_x, grid_y):
+    return not(0 <= grid_x < grid_size_x and 0 <= grid_y < grid_size_y)
+
+def whitespace_hit(grid_x, grid_y):
+    return grid[grid_y][grid_x] == " "
+
 class Car:
     def __init__(self, grid_x, grid_y, dir_str):
         self.grid_x = grid_x
         self.grid_y = grid_y
-        self.dir = Car.str_to_vec(dir_str)   
         
-    def str_to_vec(dir_str):
         if dir_str == "U":
-            return (0, -1)
+            self.dir = (0, -1)
         elif dir_str == "R":
-            return (1, 0)
+            self.dir = (1, 0)
         elif dir_str == "D":
-            return (0, 1)
+            self.dir = (0, 1)
         elif dir_str == "L":
-            return (-1, 0)
-        else:
-            raise ValueError("What the fuck is that direction?")
-    
+            self.dir = (-1, 0)
+        
     def dir_to_str(self):
+        strng = None
         if self.dir == (0, -1):
-            return "U"
+            strng = "U"
         elif self.dir == (1, 0):
-            return "R"
+            strng = "R"
         elif self.dir == (0, 1):
-            return "D"
+            strng = "D"
         elif self.dir == (-1, 0):
-            return "L"
+            strng = "L"
+        
+        # print(f"vec = {self.dir}, dir = {strng}")
+        return strng
+
+    def get_rel_dir(self, dir_str):
+        if dir_str == "R":
+            return (self.dir[1]*-1, self.dir[0])
+        elif dir_str == "L":
+            return (self.dir[1], self.dir[0]*-1)
     
     def turn(self, dir_str):
-        self.dir = Car.str_to_vec(dir_str)
+        self.dir = self.get_rel_dir(dir_str)
 
     def u_turn(self):
-        self.dir[0] *= -1
-        self.dir[1] *= -1
-    
+        self.dir = (self.dir[0] * -1, self.dir[1] * -1)
+        
     def go(self):
         new_grid_x = self.grid_x + self.dir[0]
         new_grid_y = self.grid_y + self.dir[1]
 
-        if not(0 <= new_grid_x < grid_size_x and 0 <= new_grid_y < grid_size_y) or grid[new_grid_y][new_grid_x] == " ":
+        if out_of_bound(new_grid_x, new_grid_y) or whitespace_hit(new_grid_x, new_grid_y):
             raise ValueError("Car tried to move into empty space.")
         else:
             self.grid_x = new_grid_x
             self.grid_y = new_grid_y
+
+class Simulation:
+    def __init__(self, car, start_grid, goal_grid):
+        self.car = car
+        self.start_grid = start_grid
+        self.goal_grid = goal_grid
+        self.turns = []
+        self.step = 0
+
+        self.turned_at_intersection = False
+        self.goal_reached = False
+        self.backtracking_finished = False
+    
+    def progress_steps(self):
+        self.step += 1
+        new_grid_x = self.car.grid_x + car.dir[0]
+        new_grid_y = self.car.grid_y + car.dir[1]
+        cur_tile = grid[self.car.grid_y][self.car.grid_x]
+
+        if not self.goal_reached:
+            if (self.car.grid_x, self.car.grid_y) == self.goal_grid:
+                self.goal_reached = True
+                return
+            
+            if out_of_bound(new_grid_x, new_grid_y) or whitespace_hit(new_grid_x, new_grid_y) and self.turns:
+                self.car.u_turn()
+                self.turns.pop()
+            elif cur_tile == "┼" and not self.turned_at_intersection:
+                self.car.turn("R")
+                self.turned_at_intersection = True
+                self.turns.append("R")
+            elif cur_tile == "┼":
+                self.car.go()
+                self.turned_at_intersection = False
+            else:
+                self.car.go()
+            
+        else:
+            pass
+
+        print(self.turns)
+            
 
 def draw_numbers():
     font = pygame.font.Font(None, 24)  # Use default font with size 24
@@ -139,20 +192,19 @@ def draw_car(grid_x, grid_y, direction):
     # Draw the triangle
     pygame.draw.polygon(screen, RED, [point1, point2, point3])
 
-car = Car(0, 7, "R")  # Initialize the car at grid position (7, 0) facing right
+start = (0, 7)
+goal = (10, 1)
+car = Car(start[0], start[1], "R")  # Initialize the car at grid position (0, 7) facing right
+sim = Simulation(car, start, goal)
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYUP:
             if MANUAL_CONTROL:
-                if event.key == pygame.K_UP:
-                    car.turn("U")
-                elif event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT:
                     car.turn("R")
-                elif event.key == pygame.K_DOWN:
-                    car.turn("D")
                 elif event.key == pygame.K_LEFT:
                     car.turn("L")
                 elif event.key == pygame.K_SPACE:
@@ -162,7 +214,7 @@ while running:
                         print(e)
 
             elif event.key == pygame.K_SPACE:
-                pass
+                sim.progress_steps()
 
     screen.fill("black")
     draw_track()
