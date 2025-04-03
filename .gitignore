@@ -1,0 +1,22 @@
+# Python virtual environment
+pyvenv.cfg
+Include/
+Lib/
+Scripts/
+
+# Byte-compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Distribution files
+*.dist-info/
+*.egg-info/
+
+# Pygame cache (if any)
+pygame-2.6.1.dist-info/
+
+# System-specific files
+*.log
+.DS_Store
+Thumbs.db
