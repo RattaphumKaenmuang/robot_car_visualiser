@@ -32,7 +32,7 @@ grid = [
         " │   │   │ ",
         " │   │   │ ",
         "─┼─ ─┼───┼─",
-        " │   │   │"
+        " │   │   │ "
     ]
 grid_size_x = len(grid[0])
 grid_size_y = len(grid)
@@ -98,59 +98,14 @@ class Simulation:
         self.car = car
         self.start_grid = start_grid
         self.goal_grid = goal_grid
-        self.turns = []
+        self.pathfinding_moves = []
+        self.optimal_moves = []
         self.step = 0
 
-        self.turned_at_intersection = False
-        self.goal_reached = False
-        self.backtracking_u_turn = False
-        self.backtracking_finished = False
-    
     def progress_steps(self):
         self.step += 1
-        new_grid_x = self.car.grid_x + car.dir[0]
-        new_grid_y = self.car.grid_y + car.dir[1]
-        cur_tile = grid[self.car.grid_y][self.car.grid_x]
-
-        if not self.goal_reached:
-            if (self.car.grid_x, self.car.grid_y) == self.goal_grid:
-                self.goal_reached = True
-
-            elif cur_tile == "┼" and not self.turned_at_intersection:
-                self.car.turn("R")
-                self.turned_at_intersection = True
-                self.turns.append("R")
-
-            elif cur_tile == "┼":
-                self.car.go()
-                self.turned_at_intersection = False
-
-            elif out_of_bound(new_grid_x, new_grid_y) or whitespace_hit(new_grid_x, new_grid_y) and self.turns:
-                self.car.u_turn()
-                self.turns.pop()
-                
-            else:
-                self.car.go()
-
-        elif not self.backtracking_u_turn:
-            self.car.u_turn()
-            self.backtracking_u_turn = True
-
-        elif not self.backtracking_finished:
-            if (self.car.grid_x, self.car.grid_y) == self.start_grid:
-                self.backtracking_finished = True
-            elif cur_tile == "┼" and self.turns and not self.turned_at_intersection:
-                self.car.turn("L")
-                self.turned_at_intersection = True
-                self.turns.pop()
-            elif cur_tile == "┼" and self.turns:
-                self.car.go()
-                self.turned_at_intersection = False
-            else:
-                self.car.go()
-
-        print(self.turns)
-            
+        # Implement algorithm here
+        pass
 
 def draw_numbers():
     font = pygame.font.Font(None, 24)  # Use default font with size 24
@@ -244,7 +199,7 @@ def draw_key_pressed():
         screen.blit(text, text_rect)
 
 start = (0, 13)
-goal = (6, 13)
+goal = (10, 9)
 car = Car(start[0], start[1], "R")  # Initialize the car at grid position (0, 7) facing right
 sim = Simulation(car, start, goal)
 
